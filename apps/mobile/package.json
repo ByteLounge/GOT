@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
-    "@govalert/shared": "file:../../packages/shared",
-    "@govalert/types": "file:../../packages/types",
-    "@govalert/validation": "file:../../packages/validation",
+    "@govalert/shared": "file:../../packages/shared/govalert-shared-1.0.0.tgz",
+    "@govalert/types": "file:../../packages/types/govalert-types-1.0.0.tgz",
+    "@govalert/validation": "file:../../packages/validation/govalert-validation-1.0.0.tgz",
     "@react-native-async-storage/async-storage": "1.23.1",
     "expo": "~51.0.28",
     "expo-calendar": "~13.0.5",
