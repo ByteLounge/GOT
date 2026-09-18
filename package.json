@@ -1,20 +1,17 @@
 {
-  "name": "govalert-monorepo",
+  "name": "govalert",
   "version": "1.0.0",
   "private": true,
   "description": "Government Opportunities & Scholarship Alert Android App & Platform",
-  "workspaces": [
-    "packages/*",
-    "backend",
-    "apps/*"
-  ],
   "scripts": {
-    "dev:backend": "npm --workspace=backend run dev",
-    "dev:mobile": "npm --workspace=apps/mobile start",
-    "dev:admin": "npm --workspace=apps/admin run dev",
-    "build:backend": "npm --workspace=backend run build",
-    "build:admin": "npm --workspace=apps/admin run build",
-    "test": "npm --workspace=backend test"
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:mobile": "npm --prefix apps/mobile start",
+    "dev:admin": "npm --prefix apps/admin run dev",
+    "build:packages": "npm --prefix packages/types run build && npm --prefix packages/validation run build && npm --prefix packages/shared run build",
+    "build:backend": "npm --prefix backend run build",
+    "build:admin": "npm --prefix apps/admin run build",
+    "build:apk": "powershell -ExecutionPolicy Bypass -File ./scripts/build-android-apk.ps1",
+    "test:backend": "npm --prefix backend test"
   },
   "keywords": [
     "government-jobs",
