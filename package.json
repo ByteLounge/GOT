@@ -1,0 +1,30 @@
+{
+  "name": "govalert-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Government Opportunities & Scholarship Alert Android App & Platform",
+  "workspaces": [
+    "packages/*",
+    "backend",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:backend": "npm --workspace=backend run dev",
+    "dev:mobile": "npm --workspace=apps/mobile start",
+    "dev:admin": "npm --workspace=apps/admin run dev",
+    "build:backend": "npm --workspace=backend run build",
+    "build:admin": "npm --workspace=apps/admin run build",
+    "test": "npm --workspace=backend test"
+  },
+  "keywords": [
+    "government-jobs",
+    "scholarships",
+    "react-native",
+    "android",
+    "expo",
+    "nodejs",
+    "typescript"
+  ],
+  "author": "GovAlert Team",
+  "license": "MIT"
+}

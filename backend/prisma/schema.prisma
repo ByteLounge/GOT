@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      String                  @id @default(uuid())
+  email                   String                  @unique
+  passwordHash            String
+  role                    String                  @default("user") // "user" | "admin"
+  profile                 Profile?
+  savedOpportunities      SavedOpportunity[]
+  trackedOpportunities    TrackedOpportunity[]
+  reminders               Reminder[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreferences?
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+
+  @@map("users")
+}
+
+model Profile {
+  id                        String    @id @default(uuid())
+  userId                    String    @unique
+  user                      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                      String
+  dateOfBirth               DateTime?
+  state                     String?
+  district                  String?
+  educationLevel            String?
+  degree                    String?
+  branch                    String?
+  college                   String?
+  graduationYear            Int?
+  cgpaOrPercentage          Float?
+  experience                String?
+  skills                    String[]  @default([])
+  interests                 String[]  @default([])
+  preferredLocations        String[]  @default([])
+  preferredOpportunityTypes String[]  @default([])
+  category                  String?   // e.g. "General", "OBC", "SC", "ST", "EWS"
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  @@map("profiles")
+}
+
+model Source {
+  id                 String         @id @default(uuid())
+  name               String
+  code               String         @unique
+  baseUrl            String
+  adapterType        String
+  checkIntervalHours Int            @default(6)
+  isActive           Boolean        @default(true)
+  lastRunAt          DateTime?
+  lastStatus         String         @default("IDLE")
+  errorMessage       String?
+  opportunities      Opportunity[]
+  ingestionRuns      IngestionRun[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@map("sources")
+}
+
+model Opportunity {
+  id                      String               @id @default(uuid())
+  sourceId                String?
+  source                  Source?              @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+  title                   String
+  organization            String
+  category                String
+  description             String               @db.Text
+  shortDescription        String?              @db.Text
+  applicationStartDate    DateTime?
+  applicationDeadline     DateTime?
+  examDate                DateTime?
+  resultDate              DateTime?
+  location                String?
+  workMode                String?              @default("On-site")
+  employmentType          String?              @default("Full-time")
+  vacancyCount            Int?
+  salaryMin               Float?
+  salaryMax               Float?
+  stipend                 String?
+  eligibility             String?              @db.Text
+  ageLimitMin             Int?
+  ageLimitMax             Int?
+  educationRequirements   String[]             @default([])
+  branchRequirements      String[]             @default([])
+  experienceRequirements  String?
+  categoryRequirements    String[]             @default([])
+  applicationFee          Float?
+  officialNotificationUrl String?
+  officialApplicationUrl  String?
+  officialSourceUrl       String
+  sourceType              String               @default("Official Portal")
+  sourceName              String
+  status                  String               @default("OPEN")
+  deadlineStatus          String               @default("OPEN")
+  isVerified              Boolean              @default(true)
+  contentHash             String
+  version                 Int                  @default(1)
+  isSeed                  Boolean              @default(false)
+  lastVerifiedAt          DateTime             @default(now())
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+
+  versions                OpportunityVersion[]
+  savedBy                 SavedOpportunity[]
+  trackedBy               TrackedOpportunity[]
+  reminders               Reminder[]
+  notifications           Notification[]
+  changes                 SourceChange[]
+
+  @@index([category])
+  @@index([organization])
+  @@index([applicationDeadline])
+  @@index([status])
+  @@index([contentHash])
+  @@map("opportunities")
+}
+
+model OpportunityVersion {
+  id             String      @id @default(uuid())
+  opportunityId  String
+  opportunity    Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  versionNumber  Int
+  snapshotData   Json
+  changesSummary String?     @db.Text
+  createdAt      DateTime    @default(now())
+
+  @@map("opportunity_versions")
+}
+
+model SavedOpportunity {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([userId, opportunityId])
+  @@map("saved_opportunities")
+}
+
+model TrackedOpportunity {
+  id            String      @id @default(uuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  status        String      @default("Interested")
+  notes         String?     @db.Text
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([userId, opportunityId])
+  @@map("tracked_opportunities")
+}
+
+model Reminder {
+  id               String      @id @default(uuid())
+  userId           String
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunityId    String
+  opportunity      Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  reminderDate     DateTime
+  daysBefore       Int
+  notificationType String      @default("deadline")
+  isSent           Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+
+  @@map("reminders")
+}
+
+model Notification {
+  id            String       @id @default(uuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  title         String
+  message       String       @db.Text
+  category      String
+  isRead        Boolean      @default(false)
+  metadata      Json?
+  createdAt     DateTime     @default(now())
+
+  @@map("notifications")
+}
+
+model NotificationPreferences {
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyMax             Int      @default(5)
+  quietHoursStart      String   @default("22:00")
+  quietHoursEnd        String   @default("07:00")
+  newOpportunities     Boolean  @default(true)
+  deadlineReminders    Boolean  @default(true)
+  updatesAndCorrigenda Boolean  @default(true)
+  examAlerts           Boolean  @default(true)
+  pushAlerts           Boolean  @default(true)
+  emailAlerts          Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("notification_preferences")
+}
+
+model SourceChange {
+  id            String      @id @default(uuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  fieldName     String
+  oldValue      String?     @db.Text
+  newValue      String?     @db.Text
+  detectedAt    DateTime    @default(now())
+  isNotified    Boolean     @default(false)
+
+  @@map("source_changes")
+}
+
+model IngestionRun {
+  id           String    @id @default(uuid())
+  sourceId     String
+  source       Source    @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  startTime    DateTime  @default(now())
+  endTime      DateTime?
+  status       String
+  itemsScanned Int       @default(0)
+  itemsCreated Int       @default(0)
+  itemsUpdated Int       @default(0)
+  errorMessage String?   @db.Text
+
+  @@map("ingestion_runs")
+}

@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "GovAlert",
+    "slug": "govalert",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "govalert",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F172A"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.govalert.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F172A"
+      },
+      "package": "in.govalert.app",
+      "versionCode": 1,
+      "permissions": [
+        "NOTIFICATIONS",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR",
+        "INTERNET"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "GovAlert needs permission to sync government opportunity deadlines and exam dates to your device calendar."
+        }
+      ]
+    ]
+  }
+}
