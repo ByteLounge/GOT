@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Opportunity, UserProfile, SavedOpportunity, TrackedOpportunity, Reminder, InAppNotification, NotificationPreferences } from '@govalert/types';
-import { SEED_OPPORTUNITIES } from '../../../backend/src/data/seedOpportunities';
+import { SEED_OPPORTUNITIES } from '../data/seedOpportunities';
 import { calculateDeadlineInfo, evaluateEligibility } from '@govalert/shared';
 
 // Configurable API base (e.g. for Android emulator 'http://10.0.2.2:5000/api/v1', or LAN IP)
