@@ -1,4 +1,4 @@
-package com.govalert
+package `in`.govalert.app
 
 import android.app.Application
 import android.content.res.Configuration

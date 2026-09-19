@@ -31,16 +31,18 @@ npm run build
 Set-Location "D:\Projects\GOT\packages\shared"
 npm run build
 
-# 3. Prebuild Android Native Files
-Write-Host "Running Expo Prebuild for Android..."
-Set-Location $mobileDir
-npx expo prebuild --platform android --clean --no-install
-
-# 4. Configure Keystore for Release
+# 3. Prebuild Android Native Files (if not already generated)
 $androidDir = Join-Path $mobileDir "android"
 $appDir = Join-Path $androidDir "app"
 $keystoreFile = Join-Path $appDir "release.keystore"
 
+if (!(Test-Path $androidDir)) {
+    Write-Host "Running Expo Prebuild for Android..."
+    Set-Location $mobileDir
+    npx expo prebuild --platform android --no-install
+}
+
+# 4. Configure Keystore for Release
 if (!(Test-Path $keystoreFile)) {
     Write-Host "Generating release signing keystore..."
     & "$jdkDir\bin\keytool.exe" -genkeypair -v -storetype PKCS12 -keystore $keystoreFile -alias govalert -keyalg RSA -keysize 2048 -validity 10000 -storepass govalert123 -keypass govalert123 -dname "CN=GovAlert, OU=Engineering, O=GovAlert, L=Bengaluru, ST=Karnataka, C=IN"
